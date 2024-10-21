@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle Clone</title>
+</head>
+<body>
+
+  <h1>Wordle Clone</h1>
+
+  <div>
+    <label for="answer">Optional: Set word manually</label>
+    <input type="text" id="answer" placeholder="Enter a word (optional)">
+    <button onclick="startNewGame()">Start New Game</button>
+  </div>
+
+  <h2>Session Info</h2>
+  <p>Session ID: <span id="sessionID">None</span></p>
+
+  <h2>Game State</h2>
+  <pre id="gameState">No game yet</pre>
+
+  <div>
+    <label for="guess">Make a Guess:</label>
+    <input type="text" id="guess">
+    <button onclick="makeGuess()">Submit Guess</button>
+  </div>
+
+  <div>
+    <button onclick="resetGame()">Reset Game</button>
+    <button onclick="deleteGame()">Delete Game</button>
+  </div>
+
+  <script>
+    let sessionID = undefined;
+
+    async function fetchGameState() {
+      const res = await fetch(`/gamestate?sessionID=${sessionID}`);
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('gameState').textContent = JSON.stringify(data.gameState, null, 2);
+      } else {
+        alert(data.error);
+      }
+    }
+
+    async function startNewGame() {
+      const answer = document.getElementById('answer').value;
+      const url = `/newgame${answer ? `?answer=${answer}` : ''}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (res.ok) {
+        sessionID = data.sessionID;
+        document.getElementById('sessionID').textContent = sessionID;
+        await fetchGameState();
+      } else {
+        alert(data.error);
+      }
+    }
+
+    async function resetGame() {
+      const res = await fetch(`/reset?sessionID=${sessionID}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        await fetchGameState();
+      } else {
+        alert(data.error);
+      }
+    }
+
+    async function deleteGame() {
+
+      const res = await fetch(`/delete?sessionID=${sessionID}`, { method: 'DELETE' });
+      if (res.ok) {
+        sessionID = null;
+        document.getElementById('sessionID').textContent = 'None';
+        document.getElementById('gameState').textContent = 'No game yet';
+        alert('Game session deleted');
+      } else {
+        const data = await res.json();
+        alert(data.error);
+      }
+    }
+
+    async function makeGuess() {
+      const guess = document.getElementById('guess').value;
+     
+      
+      const res = await fetch('/guess', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionID, guess })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('gameState').textContent = JSON.stringify(data.gameState, null, 2);
+      } else {
+        alert(data.error);
+      }
+    }
+  </script>
+
+</body>
+</html>

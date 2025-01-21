@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle Clone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <h1>Wordle Clone</h1>
+    <input type="text" id="guess-input" maxlength="5" placeholder="Enter your guess">
+    <button onclick="makeGuess()">Guess</button>
+    <div id="game-state"></div>
+  </div>
+
+  <script>
+    let sessionID;
+
+    // Start a new game and store sessionID
+    fetch('/newgame')
+      .then(response => response.json())
+      .then(data => {
+        sessionID = data.sessionID;
+        updateGameState();
+      });
+
+    function updateGameState() {
+      fetch(`/gamestate?sessionID=${sessionID}`)
+        .then(response => response.json())
+        .then(data => {
+          const gameState = data.gameState;
+          const gameStateDiv = document.getElementById('game-state');
+          gameStateDiv.innerHTML = JSON.stringify(gameState, null, 2);
+        });
+    }
+
+    function makeGuess() {
+      const guess = document.getElementById('guess-input').value;
+      fetch('/guess', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionID, guess }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        updateGameState();
+      });
+    }
+  </script>
+</body>
+</html>

@@ -56,7 +56,7 @@ const updateGameState = (sessionID, guess) => {
 };
 
 // Route to start a new game
-app.get('/newgame', async (req, res) => {
+server.get('/newgame', async (req, res) => {
   const sessionID = uuidv4();
   const wordToGuess = await getRandomWord();
   
@@ -74,7 +74,7 @@ app.get('/newgame', async (req, res) => {
 });
 
 // Route to get the current game state
-app.get('/gamestate', (req, res) => {
+server.get('/gamestate', (req, res) => {
   const { sessionID } = req.query;
 
   if (!sessionID) {
@@ -96,7 +96,7 @@ app.get('/gamestate', (req, res) => {
 });
 
 // Route to make a guess
-app.post('/guess', async (req, res) => {
+server.post('/guess', async (req, res) => {
   const { sessionID, guess } = req.body;
 
   if (!sessionID || !guess) {
@@ -123,7 +123,7 @@ app.post('/guess', async (req, res) => {
 });
 
 // Route to reset the game
-app.delete('/reset', (req, res) => {
+server.delete('/reset', (req, res) => {
   const { sessionID } = req.query;
 
   if (!sessionID) {
@@ -152,7 +152,7 @@ app.delete('/reset', (req, res) => {
 });
 
 // Route to delete the session
-app.delete('/delete', (req, res) => {
+server.delete('/delete', (req, res) => {
   const { sessionID } = req.query;
 
   if (!sessionID) {
@@ -168,7 +168,7 @@ app.delete('/delete', (req, res) => {
 });
 
 // Starting the server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 

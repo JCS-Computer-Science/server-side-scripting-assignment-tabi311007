@@ -168,8 +168,8 @@ server.delete('/delete', (req, res) => {
 });
 
 // Starting the server
-server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// server.listen(PORT, () => {
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// });
 
 module.exports = server;
